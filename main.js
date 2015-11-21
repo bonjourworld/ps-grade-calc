@@ -128,7 +128,7 @@ function refreshGradeItems() {
 	// sort
 	// gradeItemAry.sort( sortGradeItems );
 	// average counter variables
-	var sumWeights = sumConGrade = sumOptGrade = sumActGrades = 0;
+	var sumWeights = sumConGrades = sumOptGrades = sumActGrades = sumEarned = sumLost = 0;
 	// display courses
 
 	for( var i in gradeItemAry ) {
@@ -144,10 +144,22 @@ function refreshGradeItems() {
 			if( aryItem.actGrade == '' ) xtra = " na";
 			cols += "<td class='act"+xtra+"'>" + aryItem.actGrade + "</td>";
 			cols += "<td class='graph'>";
-			// show dots for now
-			for( var d = 0; d < Math.ceil(parseInt(aryItem.weight)); d++ ) {
-				cols += ".";
-			}
+				// show graph
+				//// has these parameters:
+				//// - container div
+				//// -- data-offset : from the left based on previous weights
+				//// -- data-size : width based on weight
+				//// - center target
+				//// -- min and max
+				//// - actual earned
+				//// -- from zero to end
+				//// - actual lost
+				//// -- from 100 to start
+				cols += "<div class='container' data-offset='"+sumWeights+"' data-width='"+aryItem.weight+"'>";
+				cols += "<div class='target' data-offset='"+aryItem.conGrade+"' data-width='"+(aryItem.optGrade-aryItem.conGrade)+"'></div>";
+				cols += "<div class='earned' data-width='"+aryItem.actGrade+"'></div>";
+				cols += "<div class='lost' data-width='"+(100-aryItem.actGrade)+"'></div>";
+				cols += "</div>"
 			cols += "</td>";
 			// create link components
 			var item = document.createElement( 'tr' );
@@ -157,15 +169,33 @@ function refreshGradeItems() {
 			item.addEventListener( 'click', selectGradeItem );
 			// add item
 			list.appendChild( item );
-
 			// count averages
-			sumWeights += parseInt( aryItem.weight );
-			sumConGrade += parseInt( aryItem.conGrade * ( aryItem.weight / 100 ) );
-			sumOptGrade += parseInt( aryItem.optGrade * ( aryItem.weight / 100 ) );
-			sumActGrades += parseInt( aryItem.actGrade * ( aryItem.weight / 100 ) );
+			sumWeights += parseFloat( aryItem.weight );
+			sumConGrades += parseFloat( aryItem.conGrade ) * ( parseFloat( aryItem.weight ) / 100 );
+			sumOptGrades += parseFloat( aryItem.optGrade ) * ( parseFloat( aryItem.weight ) / 100 );
+			sumActGrades += parseFloat( aryItem.actGrade ) * ( parseFloat( aryItem.weight ) / 100 );
+			if( aryItem.actGrade != '' ) {
+				sumEarned += parseFloat( aryItem.actGrade ) * ( parseFloat( aryItem.weight ) / 100 );
+				sumLost += ( 100 - parseFloat( aryItem.actGrade ) ) * ( parseFloat( aryItem.weight ) / 100 );
+			}
+			// update graph
+			var c = item.querySelector('.container');
+			var t = item.querySelector('.target');
+			var e = item.querySelector('.earned');
+			var l = item.querySelector('.lost');
+			c.style.width = c.dataset.width+'%';
+			c.style.left = c.dataset.offset+'%';
+			t.style.width = t.dataset.width+'%';
+			t.style.left = t.dataset.offset+'%';
+			if( aryItem.actGrade != '' ) {
+				e.style.width = e.dataset.width+'%';
+				l.style.width = l.dataset.width+'%';
+			} else {
+				e.style.width = '0%';
+				l.style.width = '0%';
+			}
 		}
-	};
-
+	}
 	// update footer
 	var foot = document.querySelector( '#course-details #grade-item-list tfoot' );
 	foot.innerHTML = '';
@@ -173,18 +203,31 @@ function refreshGradeItems() {
 	// sum of weights
 	copy += "<th>"+sumWeights+"</th>";
 	// conservative grade
-	copy += "<th>"+sumConGrade+"</th>";
+	copy += "<th>"+sumConGrades+"</th>";
 	// optimistic grade
-	copy += "<th>"+sumOptGrade+"</th>";
+	copy += "<th>"+sumOptGrades+"</th>";
 	// actual grade
 	copy += "<th>"+sumActGrades+"</th>";
-	copy += "<th>";
-	for( var i = 0; i < sumWeights; i++ ) {
-		copy += "|";
-	}
+	copy += "<th class='graph'>";
+		// show graph
+		copy += "<div class='container' data-offset='0' data-width='"+sumWeights+"'>";
+		copy += "<div class='earned' data-width='"+sumEarned+"'></div>";
+		copy += "<div class='lost' data-width='"+sumLost+"'></div>";
+		copy += "</div>"
 	copy += "</th>";
 	copy += "</tr>";
 	foot.innerHTML = copy;
+	// update graph
+	var c = foot.querySelector('.container');
+	var e = foot.querySelector('.earned');
+	var l = foot.querySelector('.lost');
+	c.style.width = c.dataset.width+'%';
+	if( sumEarned > 0 ) {
+		e.style.width = e.dataset.width+'%';
+	}
+	if( sumLost > 0 ) {
+		l.style.width = l.dataset.width+'%';
+	}
 }
 
 
