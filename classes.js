@@ -1,10 +1,14 @@
 /**
  * Local Storage:
  *
- * courses : [ ary ]
+ * courses :  ary []
  * lastCourseID : [ n ] (auto_increment)
  *
+ * gradeItems : ary [ course ][ grade-item ]
+ * lastGradeItemID : [ n ] (auto_increment)
+ *
  */
+
 
 /**
  * Course Class
@@ -14,46 +18,11 @@
  * - name
  */
 function Course( id, code, name ) {
-
 	// PUBLIC
 	//// variables
 	this.courseID = id;
 	this.courseCode = code;
 	this.courseName = name;
-
-	//// functions
-	/*
-	this.getID = function() {
-		return courseID;
-	}
-
-	this.getCode = function() {
-		return courseCode;
-	}
-	this.setCode = function( code ) {
-		courseCode = code;
-	}
-
-	this.getName = function() {
-		return courseName;
-	}
-	this.setName = function( name ) {
-		courseName = name;
-	}
-
-	this.toString = function() {
-		var obj = {};
-		obj.id = this.getID();
-		obj.code = this.getCode();
-		obj.name = this.getName();
-		return JSON.stringify( obj );
-	}
-	*/
-
-	// PRIVATE
-
-	//// functions
-
 }
 
 
@@ -66,7 +35,6 @@ function Course( id, code, name ) {
  * - weight
  */
 function GradeItem( id, courseID, name, weight, con, opt, act ) {
-
 	// PUBLIC
 	//// variables
 	this.gradeItemID = id;

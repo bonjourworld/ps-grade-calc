@@ -34,24 +34,26 @@ function refreshCourseList() {
 	// get courses
 	var courseAry = JSON.parse( localStorage.getItem( 'courses' ) ) || [];
 	// sort
-	courseAry.sort( sortCourses );
+	// courseAry.sort( sortCourses );
 	// display courses
-	for( var i = courseAry.length - 1; i >= 0; i-- ) {
-		// build text
-		var copy = "";
-		copy += "<div class='wrapper'>";
-		copy += "<span class='name'>" + courseAry[i].courseName + "</span>";
-		copy += "<span class='code'>[" + courseAry[i].courseCode + "]</span>";
-		copy += "</div>";
-		copy += "<span class='chevron'>&gt;</span>";
-		// create link components
-		var link = document.createElement( 'li' );
-		link.setAttribute( 'courseID', courseAry[i].courseID );
-		link.innerHTML = copy;
-		// add event listener
-		link.addEventListener( 'click', selectCourse );
-		// add link
-		ul.appendChild( link );
+	for( var i in courseAry ) {
+		if( courseAry.hasOwnProperty(i) ) {
+			// build text
+			var copy = "";
+			copy += "<div class='wrapper'>";
+			copy += "<span class='name'>" + courseAry[i].courseName + "</span>";
+			copy += "<span class='code'>[" + courseAry[i].courseCode + "]</span>";
+			copy += "</div>";
+			copy += "<span class='chevron'>&gt;</span>";
+			// create link components
+			var link = document.createElement( 'li' );
+			link.setAttribute( 'courseID', courseAry[i].courseID );
+			link.innerHTML = copy;
+			// add event listener
+			link.addEventListener( 'click', selectCourse );
+			// add link
+			ul.appendChild( link );
+		}
 	};
 	// console.log( courseAry );
 }
@@ -66,9 +68,7 @@ function selectCourse( ev ) {
 	// find the Course Object
 	var courseID = ev.target.closest('li').getAttribute('courseID');
 	var courseAry = JSON.parse( localStorage.getItem( 'courses' ) ) || [];
-	var courseObj = courseAry.find( function( a ){
-		if( a.courseID == courseID) return a;
-	});
+	var courseObj = courseAry[ 'c'+courseID ];
 	// show panel
 	var panel = document.querySelector('#course-details');
 	panel.setAttribute( 'courseID', courseObj.courseID );
@@ -80,6 +80,31 @@ function selectCourse( ev ) {
 	refreshGradeItems();
 	// console.log( ev );
 	// console.log( 'courseObj', courseObj );
+}
+
+function selectGradeItem( ev ) {
+	// prevent default button behaviour
+	if( !ev ) var ev = window.event;
+	if( ev.preventDefault ) ev.preventDefault();
+	// find the Course Object
+	var row = ev.target.closest('tr');
+	var gradeItemID = row.getAttribute('gradeItemID');
+	var gradeItemAry = JSON.parse( localStorage.getItem('gradeItems') ) || [];
+	// select grades for the course
+	var courseID = document.querySelector('#course-details').getAttribute('courseID');
+	// stop if no record
+	if( !gradeItemAry[ 'c'+courseID ][ 'g'+gradeItemID ] ) return;
+	var gradeItemObj = gradeItemAry[ 'c'+courseID ][ 'g'+gradeItemID ];
+	// show panel
+	var panel = document.querySelector('#add-grade-item-form');
+	panel.setAttribute( 'gradeItemID', gradeItemObj.gradeItemID );
+	panel.style.display = 'block';
+	// populate panel with course info
+	panel.querySelector('#grade-item-name').value = gradeItemObj.name;
+	panel.querySelector('#grade-item-weight').value = gradeItemObj.weight;
+	panel.querySelector('#grade-item-con-grade').value = gradeItemObj.conGrade;
+	panel.querySelector('#grade-item-opt-grade').value = gradeItemObj.optGrade;
+	panel.querySelector('#grade-item-act-grade').value = gradeItemObj.actGrade;
 }
 
 /**
@@ -95,48 +120,52 @@ function refreshGradeItems() {
 	// if( gradeItemAry.length <= 0 ) return;
 	// only grades for this course
 	var courseID = document.querySelector('#course-details').getAttribute('courseID');
-	gradeItemAry = gradeItemAry[ courseID ];
+	gradeItemAry = gradeItemAry[ 'c'+courseID ];
 	// if none
 	if( !gradeItemAry || gradeItemAry.length == 0 ) {
 		list.innerHTML = "<tr><td>Please add a Grade Item.</td><td></td><td></td><td></td><td></td></tr>";
+		// clear footer
+		document.querySelector( '#course-details #grade-item-list tfoot' ).innerHTML = '';
 		return;
 	}
 	// sort
-	gradeItemAry.sort( sortGradeItems );
+	// gradeItemAry.sort( sortGradeItems );
 	// average counter variables
-	var sumWeights = sumConGrade = sumOptGrade = sumAcGrades = 0;
+	var sumWeights = sumConGrade = sumOptGrade = sumActGrades = 0;
 	// display courses
-	for( var i = gradeItemAry.length - 1; i >= 0; i-- ) {
-		// build text
-		var xtra = "";
-		var cols = "";
-		cols += "<td class='name'>" + gradeItemAry[i].name + "</td>";
-		cols += "<td class='weight'>" + gradeItemAry[i].weight + "</td>";
-		cols += "<td class='con'>" + gradeItemAry[i].conGrade + "</td>";
-		cols += "<td class='opt'>" + gradeItemAry[i].optGrade + "</td>";
-		if( gradeItemAry[i].actGrade == '' ) xtra = " na";
-		cols += "<td class='act"+xtra+"'>" + gradeItemAry[i].actGrade + "</td>";
-		cols += "<td class='graph'>";
-		// show dots for now
-		for( var d = 0; d < Math.ceil(parseInt(gradeItemAry[i].weight)); d++ ) {
-			cols += ".";
+
+	for( var i in gradeItemAry ) {
+		if( gradeItemAry.hasOwnProperty(i) ) {
+			// build text
+			var xtra = "";
+			var cols = "";
+			cols += "<td class='name'>" + gradeItemAry[i].name + "</td>";
+			cols += "<td class='weight'>" + gradeItemAry[i].weight + "</td>";
+			cols += "<td class='con'>" + gradeItemAry[i].conGrade + "</td>";
+			cols += "<td class='opt'>" + gradeItemAry[i].optGrade + "</td>";
+			if( gradeItemAry[i].actGrade == '' ) xtra = " na";
+			cols += "<td class='act"+xtra+"'>" + gradeItemAry[i].actGrade + "</td>";
+			cols += "<td class='graph'>";
+			// show dots for now
+			for( var d = 0; d < Math.ceil(parseInt(gradeItemAry[i].weight)); d++ ) {
+				cols += ".";
+			}
+			cols += "</td>";
+			// create link components
+			var item = document.createElement( 'tr' );
+			item.setAttribute( 'gradeItemID', gradeItemAry[i].gradeItemID );
+			item.innerHTML = cols;
+			// add event listener
+			item.addEventListener( 'click', selectGradeItem );
+			// add item
+			list.appendChild( item );
+
+			// count averages
+			sumWeights += parseInt( gradeItemAry[i].weight );
+			sumConGrade += parseInt( gradeItemAry[i].conGrade );
+			sumOptGrade += parseInt( gradeItemAry[i].optGrade );
+			sumActGrades += parseInt( gradeItemAry[i].actGrade );
 		}
-		cols += "</td>";
-		// create link components
-		var item = document.createElement( 'tr' );
-		item.setAttribute( 'gradeItemID', gradeItemAry[i].gradeItemID );
-		item.innerHTML = cols;
-		// add event listener
-		// item.addEventListener( 'click', selectCourse );
-		// add item
-		list.appendChild( item );
-
-		// count averages
-		sumWeights += parseInt( gradeItemAry[i].weight );
-		sumConGrade += parseInt( gradeItemAry[i].conGrade );
-		sumOptGrade += parseInt( gradeItemAry[i].optGrade );
-		sumAcGrades += parseInt( gradeItemAry[i].actGrade );
-
 	};
 	console.log( gradeItemAry );
 	console.log( "sumWeights: ", sumWeights );
@@ -145,18 +174,21 @@ function refreshGradeItems() {
 	var foot = document.querySelector( '#course-details #grade-item-list tfoot' );
 	foot.innerHTML = '';
 	var copy = "<tr><th></th>";
+	// sum of weights
 	copy += "<th>"+sumWeights+"</th>";
+	// conservative grade
 	copy += "<th>"+sumConGrade+"</th>";
+	// optimistic grade
 	copy += "<th>"+sumOptGrade+"</th>";
-	copy += "<th>"+sumAcGrades+"</th>";
+	// actual grade
+	copy += "<th>"+sumActGrades+"</th>";
 	copy += "<th>";
 	for( var i = 0; i < sumWeights; i++ ) {
-		copy += "|"
+		copy += "|";
 	}
 	copy += "</th>";
 	copy += "</tr>";
 	foot.innerHTML = copy;
-
 }
 
 
@@ -200,6 +232,15 @@ function saveCourse( ev ) {
 	var courseName = formCourseName.value;
 	// hide form
 	hideCourseForm();
+	// get existing object
+	var id = document.querySelector('#add-course-form').getAttribute( 'courseID' );
+	// set id
+	if( id == null ) {
+		// get last id
+		id = localStorage.getItem( 'lastGradeItemID' ) || 0;
+		id++;
+		localStorage.setItem( 'lastGradeItemID', id );
+	}
 	// get last id
 	var id = localStorage.getItem( 'lastCourseID' ) || 0;
 	id++;
@@ -207,15 +248,16 @@ function saveCourse( ev ) {
 	// create a course object
 	var courseObj = new Course( id, courseCode, courseName );
 	// get courses
-	var courseAry = JSON.parse( localStorage.getItem( 'courses' ) ) || [];
+	var courseAry = JSON.parse( localStorage.getItem( 'courses' ) ) || {};
+	// existing course
+	if( !courseAry[ 'c'+id ] ) courseAry[ 'c'+id ] = {};
 	// add to array
-	courseAry.push( courseObj );
+	courseAry[ 'c'+id ] = courseObj;
 	// save course to local storage
 	localStorage.setItem( 'courses', JSON.stringify( courseAry ) );
 	// refresh display
 	refreshCourseList();
 }
-
 
 
 
@@ -267,22 +309,29 @@ function saveGradeItem( ev ) {
 	var actGrade = formGradeItemActGrade.value;
 	// hide form
 	hideGradeItemForm();
-	// get last id
-	var id = localStorage.getItem( 'lastGradeItemID' ) || 0;
-	id++;
-	localStorage.setItem( 'lastGradeItemID', id );
+	// get existing object
+	var id = document.querySelector('#add-grade-item-form').getAttribute( 'gradeItemID' );
+	// set id
+	if( id == null ) {
+		// get last id
+		id = localStorage.getItem( 'lastGradeItemID' ) || 0;
+		id++;
+		localStorage.setItem( 'lastGradeItemID', id );
+	}
 	// create a grade item object
 	var gradeItemObj = new GradeItem( id, courseID, itemName, itemWeight, conGrade, optGrade, actGrade );
 	// get grade items
-	var gradeItemAry = JSON.parse( localStorage.getItem( 'gradeItems' ) ) || [];
+	var gradeItemAry = JSON.parse( localStorage.getItem( 'gradeItems' ) ) || {};
 	// add to array
-	if( !gradeItemAry[courseID] ) gradeItemAry[courseID] = [];
-	gradeItemAry[ courseID.toString() ].push( gradeItemObj );
+	if( !gradeItemAry[ 'c'+courseID ] ) gradeItemAry[ 'c'+courseID ] = {};
+	if( !gradeItemAry[ 'c'+courseID ][ 'g'+id ] ) gradeItemAry[ 'c'+courseID ][ 'g'+id ] = {};
+	gradeItemAry[ 'c'+courseID ][ 'g'+id ] = gradeItemObj;
 	// save grade item to local storage
 	localStorage.setItem( 'gradeItems', JSON.stringify( gradeItemAry ) );
 	// refresh display
 	refreshGradeItems();
 }
+
 
 
 /**
