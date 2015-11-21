@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Grade Calculator</title>
+<link rel='stylesheet' href='main.css' />
+</head>
+<body>
+
+	<!-- MASTER -->
+	<div class='master'>
+		<div id='course-list-container'>
+			<ul id='course-list'></ul>
+			<a href='#' id='add-course'>Add Course</a>
+		</div>
+	</div>
+
+	<!-- DETAIL -->
+	<div class='detail'>
+		<!-- form for creating new courses -->
+		<form id='add-course-form'>
+			<input type='text' id='course-code' name='course-code' placeholder='Course Code' />
+			<input type='text' id='course-name' name='course-name' placeholder='Course Name' />
+			<input type='button' role='cancel' value='Cancel' />
+			<input type='submit' role='submit' value='Save' />
+		</form>
+		<!-- display for viewing course info -->
+		<div id='course-details'>
+			<header>
+				<h1 class='courseName'></h1>
+				<h3 class='courseCode'></h3>
+			</header>
+			<table id='grade-item-list'>
+				<thead>
+					<tr>
+						<th>Grade Item</th>
+						<th>Weight</th>
+						<th>Min</th>
+						<th>Max</th>
+						<th>Grade</th>
+						<th>Graph</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+				<tfoot>
+					<tr>
+						<th></th>
+						<th>100</th>
+						<th>XX</th>
+						<th>YY</th>
+						<th>ZZ</th>
+						<th>||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||</th>
+					</tr>
+				</tfoot>
+			</table>
+			<!-- button for adding new grade items -->
+			<a href='#' id='add-grade-item'>Add Grade Item</a>
+			<!-- form for adding new grade items -->
+			<form id='add-grade-item-form'>
+				<input type='text' id='grade-item-name' name='grade-item-name' placeholder='Grade Item Name' />
+				<input type='text' id='grade-item-weight' name='grade-item-weight' placeholder='Grade Item Weight' />
+				<input type='text' id='grade-item-con-grade' name='grade-item-con-grade' placeholder='Conservative Estimate' />
+				<input type='text' id='grade-item-opt-grade' name='grade-item-opt-grade' placeholder='Optimistic Estimate' />
+				<input type='text' id='grade-item-act-grade' name='grade-item-act-grade' placeholder='Actual Grade' />
+				<input type='button' role='cancel' value='Cancel' />
+				<input type='submit' role='submit' value='Save' />
+			</form>
+		</div>
+	</div>
+
+	<script src='main.js'></script>
+	<script src='classes.js'></script>
+
+</body>
+</html>
