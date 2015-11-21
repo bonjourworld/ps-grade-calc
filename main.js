@@ -55,7 +55,6 @@ function refreshCourseList() {
 			ul.appendChild( link );
 		}
 	};
-	// console.log( courseAry );
 }
 
 /**
@@ -78,8 +77,6 @@ function selectCourse( ev ) {
 	panel.querySelector('h3').textContent = courseObj.courseCode;
 	// show grade items
 	refreshGradeItems();
-	// console.log( ev );
-	// console.log( 'courseObj', courseObj );
 }
 
 function selectGradeItem( ev ) {
@@ -136,24 +133,25 @@ function refreshGradeItems() {
 
 	for( var i in gradeItemAry ) {
 		if( gradeItemAry.hasOwnProperty(i) ) {
+			var aryItem = gradeItemAry[i];
 			// build text
 			var xtra = "";
 			var cols = "";
-			cols += "<td class='name'>" + gradeItemAry[i].name + "</td>";
-			cols += "<td class='weight'>" + gradeItemAry[i].weight + "</td>";
-			cols += "<td class='con'>" + gradeItemAry[i].conGrade + "</td>";
-			cols += "<td class='opt'>" + gradeItemAry[i].optGrade + "</td>";
-			if( gradeItemAry[i].actGrade == '' ) xtra = " na";
-			cols += "<td class='act"+xtra+"'>" + gradeItemAry[i].actGrade + "</td>";
+			cols += "<td class='name'>" + aryItem.name + "</td>";
+			cols += "<td class='weight'>" + aryItem.weight + "</td>";
+			cols += "<td class='con'>" + aryItem.conGrade + "</td>";
+			cols += "<td class='opt'>" + aryItem.optGrade + "</td>";
+			if( aryItem.actGrade == '' ) xtra = " na";
+			cols += "<td class='act"+xtra+"'>" + aryItem.actGrade + "</td>";
 			cols += "<td class='graph'>";
 			// show dots for now
-			for( var d = 0; d < Math.ceil(parseInt(gradeItemAry[i].weight)); d++ ) {
+			for( var d = 0; d < Math.ceil(parseInt(aryItem.weight)); d++ ) {
 				cols += ".";
 			}
 			cols += "</td>";
 			// create link components
 			var item = document.createElement( 'tr' );
-			item.setAttribute( 'gradeItemID', gradeItemAry[i].gradeItemID );
+			item.setAttribute( 'gradeItemID', aryItem.gradeItemID );
 			item.innerHTML = cols;
 			// add event listener
 			item.addEventListener( 'click', selectGradeItem );
@@ -161,14 +159,12 @@ function refreshGradeItems() {
 			list.appendChild( item );
 
 			// count averages
-			sumWeights += parseInt( gradeItemAry[i].weight );
-			sumConGrade += parseInt( gradeItemAry[i].conGrade );
-			sumOptGrade += parseInt( gradeItemAry[i].optGrade );
-			sumActGrades += parseInt( gradeItemAry[i].actGrade );
+			sumWeights += parseInt( aryItem.weight );
+			sumConGrade += parseInt( aryItem.conGrade * ( aryItem.weight / 100 ) );
+			sumOptGrade += parseInt( aryItem.optGrade * ( aryItem.weight / 100 ) );
+			sumActGrades += parseInt( aryItem.actGrade * ( aryItem.weight / 100 ) );
 		}
 	};
-	console.log( gradeItemAry );
-	console.log( "sumWeights: ", sumWeights );
 
 	// update footer
 	var foot = document.querySelector( '#course-details #grade-item-list tfoot' );
